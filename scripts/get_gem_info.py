@@ -1,3 +1,5 @@
+import json
+
 import requests
 import re
 from bs4 import BeautifulSoup
@@ -5,20 +7,39 @@ from bs4 import BeautifulSoup
 
 GEM_REWARDS_PAGE = "https://pathofexile.gamepedia.com/List_of_skill_gems_rewarded_from_quests"
 
-REWARD_TEXT_RE = re.compile("Act (\d{1}) after ([\w,\s]+) with (any character|[\w\,\s]+)")
+REWARD_TEXT_RE = re.compile(r"Act (?P<act>\d) after (?P<quest>[\w,\s]+) with (?P<classes>any character|[\w,\s]+)")
 VENDOR_REWARD_TEXT_RE = re.compile(
-    "Act (\d{1}) after ([\w,\s]+) from ([\w\s]+) with (any character|[\w\,\s]+)"
+    r"Act (?P<act>\d) after (?P<quest>[\w,\s]+) from (?P<vendor>[\w\s]+) with (?P<classes>any character|[\w,\s]+)"
 )
+
+
+def parse_reward_info(match_obj, vendor=True):
+    if not match_obj:
+        return
+
+    classes = [_.strip() for _ in match_obj.group("classes").lower().split(",")]
+    if classes == ["any character"]:
+        classes = None
+
+    return {
+        "act": match_obj.group("act"),
+        "quest": match_obj.group("quest"),
+        "vendor": match_obj.group("vendor") if vendor else None,
+        "classes": classes
+    }
 
 
 def parse_gem_info(row):
     gem, quest_reward, vendor_reward = row.find_all("td")
-    name = gem.find("a").text
-    return (
-        name,
-        REWARD_TEXT_RE.findall(quest_reward.text),
-        VENDOR_REWARD_TEXT_RE.findall(vendor_reward.text),
-    )
+    return {
+        "name": gem.find("a").text,
+        "quest_reward": parse_reward_info(
+            REWARD_TEXT_RE.match(quest_reward.text), vendor=False
+        ),
+        "vendor_reward": [
+            parse_reward_info(_) for _ in VENDOR_REWARD_TEXT_RE.finditer(vendor_reward.text)
+        ],
+    }
 
 
 def get_quest_reward_gems():
@@ -32,9 +53,8 @@ def get_quest_reward_gems():
 
 
 def main():
-    print(list(get_quest_reward_gems()))
+    print(json.dumps({"gems": list(get_quest_reward_gems())}))
 
 
 if __name__ == "__main__":
     main()
-
