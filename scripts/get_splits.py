@@ -82,7 +82,7 @@ def get_splits(gem_progression):
         act = details["act"]
         gem = details["reward"]
         if gem:
-            yield f"{gem} - Quest Reward (\"{quest_name}\", {act})"
+            yield f"{gem.replace('Support', '(S)')} - Quest Reward (\"{quest_name}\", {act})"
             # yield {"gem": gem, "quest": quest_name, "act": act}
 
         vendors = details["vendors"]
@@ -91,7 +91,7 @@ def get_splits(gem_progression):
 
         for v, gems in vendors.items():
             for gem in gems:
-                yield f"{gem} - from \"{v}\" (\"{quest_name}\", {act})"
+                yield f"{gem.replace('Support','(S)')} - from \"{v}\" (\"{quest_name}\", {act})"
                 # yield {"gem": gem, "quest": quest_name, "act": act, "vendor": v}
 
 
