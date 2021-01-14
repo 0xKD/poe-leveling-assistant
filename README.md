@@ -11,6 +11,6 @@ Tech needed
 
 Future
 ====
-- Create web or desktop interface for ease of use
+- Create a web or desktop interface for ease of use
 - Define gem links (bare minimum, maxed out)
-- Sync with character API so it keeps track of what you have so far (gems+links)
+- Sync with character API, keeping track of what you have so far (gems+links)

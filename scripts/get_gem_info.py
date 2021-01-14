@@ -7,9 +7,9 @@ from bs4 import BeautifulSoup
 
 GEM_REWARDS_PAGE = "https://pathofexile.gamepedia.com/List_of_skill_gems_rewarded_from_quests"
 
-REWARD_TEXT_RE = re.compile(r"Act (?P<act>\d) after (?P<quest>[\w,\s]+) with (?P<classes>any character|[\w,\s]+)")
+REWARD_TEXT_RE = re.compile(r"Act (?P<act>\d) after (?P<quest>.+?) with (?P<classes>any character|[\w,\s]+)")
 VENDOR_REWARD_TEXT_RE = re.compile(
-    r"Act (?P<act>\d) after (?P<quest>[\w,\s]+) from (?P<vendor>[\w\s]+) with (?P<classes>any character|[\w,\s]+)"
+    r"Act (?P<act>\d) after (?P<quest>.+?) from (?P<vendor>.+?) with (?P<classes>any character|[\w,\s]+)"
 )
 
 
