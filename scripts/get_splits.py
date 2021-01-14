@@ -1,4 +1,5 @@
 import json
+import itertools
 import logging
 import sys
 from collections import OrderedDict, defaultdict
@@ -52,7 +53,8 @@ def get_gem_progression(selected_gems, gems, quests, klass=None):
     else:
         LOGGER.warning("Character class not supplied, results will be suboptimal")
 
-    gem_info = [_ for _ in gems if _["name"] in selected_gems]
+    gems_map = {_["name"]: _ for _ in gems}
+    gem_info = [gems_map[_] for _ in selected_gems]
     quests_map = OrderedDict()
     for q in quests:
         # "reward" will have gem, "vendors": will have vendor_name: gems
@@ -90,8 +92,13 @@ def get_splits(gem_progression):
             continue
 
         for v, gems in vendors.items():
-            for gem in gems:
-                yield f"{gem.replace('Support','(S)')} - from \"{v}\" (\"{quest_name}\", {act})"
+            for gem, rows in itertools.groupby(sorted(gems)):
+                count = len(list(rows))
+                if count > 1:
+                    prefix = f"{count}x"
+                else:
+                    prefix = ""
+                yield f"{prefix} {gem.replace('Support','(S)')} - from \"{v}\" (\"{quest_name}\", {act})"
                 # yield {"gem": gem, "quest": quest_name, "act": act, "vendor": v}
 
 
@@ -104,6 +111,7 @@ def main(gems_file, quests_file, klass=None):
         gems = json.loads(f.read())["gems"]
 
     selected = build_gems_list(gems)
+    # print("selected:", selected)
 
     with open(quests_file) as f:
         quests = json.loads(f.read())["quests"]
